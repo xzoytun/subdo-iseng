@@ -229,6 +229,35 @@
   .error { color: var(--danger); border-color: #3a1f1f; }
   .error svg { stroke: var(--danger); width: 18px; height: 18px; flex-shrink: 0; }
 
+  /* pagination */
+  .pagination {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    padding: 4px;
+  }
+  .page-btn {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 9px 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .page-btn svg { stroke: var(--text); width: 14px; height: 14px; stroke-width: 2.4; }
+  .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .page-info {
+    font-size: 12.5px;
+    color: var(--muted);
+    font-family: 'SF Mono', 'Consolas', monospace;
+  }
+
   footer {
     display: flex;
     flex-direction: column;
@@ -302,6 +331,18 @@
 
   <div class="results" id="results"></div>
 
+  <div class="pagination" id="pagination">
+    <button class="page-btn" id="prevBtn" onclick="goToPage(currentPage - 1)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Prev
+    </button>
+    <span class="page-info" id="pageInfo"></span>
+    <button class="page-btn" id="nextBtn" onclick="goToPage(currentPage + 1)">
+      Next
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+
   <footer>
     <span>Gunakan hanya pada domain milik sendiri atau target program bug bounty resmi.</span>
     <span>Data dari crt.sh &amp; hackertarget.com.</span>
@@ -318,6 +359,14 @@ const errorBox = document.getElementById('errorBox');
 const errorText = document.getElementById('errorText');
 const emptyBox = document.getElementById('emptyBox');
 const resultsEl = document.getElementById('results');
+const pagination = document.getElementById('pagination');
+const pageInfo = document.getElementById('pageInfo');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+const PAGE_SIZE = 10;
+let allActive = [];
+let currentPage = 0;
 
 const ICONS = {
   globe: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/></svg>`,
@@ -337,7 +386,44 @@ function resetUI() {
   summary.style.display = 'none';
   errorBox.style.display = 'none';
   emptyBox.style.display = 'none';
+  pagination.style.display = 'none';
   resultsEl.innerHTML = '';
+  allActive = [];
+  currentPage = 0;
+}
+
+function renderResultItem(item) {
+  const div = document.createElement('div');
+  div.className = 'result-item';
+  div.innerHTML = `
+    <div class="host-row">
+      ${ICONS.check}
+      <span class="host">${item.host}</span>
+    </div>
+    <div class="meta">
+      <span class="badge neutral">${ICONS.globe}${item.ip}</span>
+      <span class="badge ${item.cloudflare ? 'cf' : ''}">${item.cloudflare ? ICONS.cloud + 'CF' : ICONS.home + 'Direct'}</span>
+      <span class="badge ${statusBadgeClass(item.status)}">${ICONS.server}${item.status}</span>
+    </div>
+  `;
+  return div;
+}
+
+function goToPage(page) {
+  const totalPages = Math.max(1, Math.ceil(allActive.length / PAGE_SIZE));
+  currentPage = Math.min(Math.max(0, page), totalPages - 1);
+
+  resultsEl.innerHTML = '';
+  const start = currentPage * PAGE_SIZE;
+  const slice = allActive.slice(start, start + PAGE_SIZE);
+  slice.forEach(item => resultsEl.appendChild(renderResultItem(item)));
+
+  pageInfo.textContent = `${currentPage + 1} / ${totalPages}`;
+  prevBtn.disabled = currentPage === 0;
+  nextBtn.disabled = currentPage >= totalPages - 1;
+  pagination.style.display = totalPages > 1 ? 'flex' : 'none';
+
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function statusBadgeClass(code) {
@@ -386,25 +472,11 @@ async function startScan() {
         <span>Dicek: <b>${data.checked}</b></span>
         <span class="sep">·</span>
         <span>Aktif: <b>${data.active.length}</b></span>
-        ${data.truncated ? `<div class="warn-line">${ICONS.alert}<span>Hasil dibatasi karena jumlah subdomain terlalu banyak</span></div>` : ''}
+        ${data.truncated ? `<div class="warn-line">${ICONS.alert}<span>Domain punya lebih dari 300 host, hanya 300 pertama yang dicek</span></div>` : ''}
       `;
 
-      data.active.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'result-item';
-        div.innerHTML = `
-          <div class="host-row">
-            ${ICONS.check}
-            <span class="host">${item.host}</span>
-          </div>
-          <div class="meta">
-            <span class="badge neutral">${ICONS.globe}${item.ip}</span>
-            <span class="badge ${item.cloudflare ? 'cf' : ''}">${item.cloudflare ? ICONS.cloud + 'CF' : ICONS.home + 'Direct'}</span>
-            <span class="badge ${statusBadgeClass(item.status)}">${ICONS.server}${item.status}</span>
-          </div>
-        `;
-        resultsEl.appendChild(div);
-      });
+      allActive = data.active;
+      goToPage(0);
     }
   } catch (err) {
     statusBox.style.display = 'none';
