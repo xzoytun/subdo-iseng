@@ -166,20 +166,6 @@
   }
   .summary .warn-line svg { stroke: var(--warn); width: 14px; height: 14px; }
 
-  .legend {
-    display: none;
-    align-items: center;
-    gap: 16px;
-    font-size: 12px;
-    color: var(--muted);
-    margin: -4px 0 14px 2px;
-    flex-wrap: wrap;
-  }
-  .legend-item { display: flex; align-items: center; gap: 6px; }
-  .legend-item svg { width: 15px; height: 15px; stroke-width: 1.8; }
-  .legend-item.healthy svg { stroke: #f4f7f9; fill: #f4f7f9; fill-opacity: 0.12; }
-  .legend-item.unhealthy svg { stroke: var(--warn); fill: var(--warn); fill-opacity: 0.14; }
-
   /* results */
   .results { display: flex; flex-direction: column; gap: 8px; }
   .result-item {
@@ -196,11 +182,7 @@
   }
   .result-item:hover { border-color: var(--border); }
   .host-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .host-row svg.check-icon { stroke: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
-  .status-cloud { flex-shrink: 0; display: flex; align-items: center; }
-  .status-cloud svg { width: 17px; height: 17px; }
-  .status-cloud.healthy svg { stroke: #f4f7f9; fill: #f4f7f9; fill-opacity: 0.12; }
-  .status-cloud.unhealthy svg { stroke: var(--warn); fill: var(--warn); fill-opacity: 0.14; }
+  .host-row svg { width: 15px; height: 15px; stroke: var(--accent); flex-shrink: 0; }
   .host {
     font-family: 'SF Mono', 'Consolas', monospace;
     font-size: 13.5px;
@@ -333,11 +315,6 @@
 
   <div class="summary" id="summary"></div>
 
-  <div class="legend" id="legend">
-    <span class="legend-item healthy"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.5A4.5 4.5 0 0 0 6.5 19h11Z"/></svg>Status sehat (2xx/3xx)</span>
-    <span class="legend-item unhealthy"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.5A4.5 4.5 0 0 0 6.5 19h11Z"/></svg>Bermasalah (4xx/5xx)</span>
-  </div>
-
   <div class="error" id="errorBox">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -382,7 +359,6 @@ const errorBox = document.getElementById('errorBox');
 const errorText = document.getElementById('errorText');
 const emptyBox = document.getElementById('emptyBox');
 const resultsEl = document.getElementById('results');
-const legend = document.getElementById('legend');
 const pagination = document.getElementById('pagination');
 const pageInfo = document.getElementById('pageInfo');
 const prevBtn = document.getElementById('prevBtn');
@@ -397,8 +373,7 @@ const ICONS = {
   cloud: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.5A4.5 4.5 0 0 0 6.5 19h11Z"/></svg>`,
   home: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>`,
   server: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="7" rx="1.5"/><rect x="2" y="14" width="20" height="7" rx="1.5"/><line x1="6" y1="6.5" x2="6.01" y2="6.5"/><line x1="6" y1="17.5" x2="6.01" y2="17.5"/></svg>`,
-  check: `<svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
-  cloudStatus: `<svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.5A4.5 4.5 0 0 0 6.5 19h11Z"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
   target: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>`,
   alert: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
 };
@@ -409,7 +384,6 @@ domainInput.addEventListener('keydown', (e) => {
 
 function resetUI() {
   summary.style.display = 'none';
-  legend.style.display = 'none';
   errorBox.style.display = 'none';
   emptyBox.style.display = 'none';
   pagination.style.display = 'none';
@@ -421,10 +395,8 @@ function resetUI() {
 function renderResultItem(item) {
   const div = document.createElement('div');
   div.className = 'result-item';
-  const healthy = item.status >= 200 && item.status < 400;
   div.innerHTML = `
     <div class="host-row">
-      <span class="status-cloud ${healthy ? 'healthy' : 'unhealthy'}" title="${healthy ? 'Status sehat' : 'Status bermasalah'}">${ICONS.cloudStatus}</span>
       ${ICONS.check}
       <span class="host">${item.host}</span>
     </div>
@@ -504,7 +476,6 @@ async function startScan() {
       `;
 
       allActive = data.active;
-      legend.style.display = 'flex';
       goToPage(0);
     }
   } catch (err) {
