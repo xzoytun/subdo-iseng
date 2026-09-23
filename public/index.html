@@ -6,158 +6,238 @@
 <title>Subdomain Finder Pro</title>
 <style>
   :root {
-    --bg: #0b0f14;
-    --panel: #131a22;
-    --panel-2: #1a232e;
-    --border: #24303c;
-    --accent: #3ddc97;
-    --accent-2: #4fa8ff;
-    --text: #e6edf3;
-    --muted: #8896a3;
-    --danger: #ff6b6b;
+    --bg: #0a0d12;
+    --panel: #12161d;
+    --panel-2: #181d26;
+    --border: #232a35;
+    --border-soft: #1b212a;
+    --accent: #35d0a0;
+    --accent-dim: #1f5b47;
+    --accent-2: #4f9dff;
+    --text: #e8edf2;
+    --muted: #7c8894;
+    --faint: #4c5561;
+    --danger: #ff6767;
+    --warn: #f5a742;
   }
   * { box-sizing: border-box; }
+  html { -webkit-tap-highlight-color: transparent; }
   body {
     margin: 0;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: radial-gradient(circle at top, #101820 0%, #0b0f14 60%);
+    background: var(--bg);
+    background-image: radial-gradient(ellipse 900px 500px at 50% -10%, rgba(53, 208, 160, 0.08), transparent);
     color: var(--text);
     min-height: 100vh;
-    padding: 24px 16px 60px;
+    padding: 32px 18px 60px;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 720px; margin: 0 auto; }
-  header { text-align: center; margin-bottom: 28px; }
-  header .logo {
-    font-size: 13px;
-    letter-spacing: 3px;
-    color: var(--accent);
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  header h1 {
-    margin: 8px 0 6px;
-    font-size: 26px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  header p { color: var(--muted); font-size: 14px; margin: 0; }
+  .wrap { max-width: 680px; margin: 0 auto; }
 
+  /* header */
+  header { margin-bottom: 32px; }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .brand-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-icon svg { width: 20px; height: 20px; stroke: #071310; }
+  .brand-text h1 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .brand-text p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* card */
   .card {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 18px;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
   }
 
   .input-row { display: flex; gap: 10px; }
-  input[type=text] {
+  .input-field {
     flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-field svg {
+    position: absolute;
+    left: 14px;
+    width: 16px; height: 16px;
+    stroke: var(--faint);
+    pointer-events: none;
+  }
+  input[type=text] {
+    width: 100%;
     background: var(--panel-2);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 13px 14px;
-    border-radius: 10px;
+    padding: 13px 14px 13px 40px;
+    border-radius: 11px;
     font-size: 15px;
     outline: none;
-    transition: border 0.2s;
+    transition: border-color 0.15s;
   }
   input[type=text]:focus { border-color: var(--accent-2); }
-  input[type=text]::placeholder { color: #56636f; }
+  input[type=text]::placeholder { color: var(--faint); }
 
   button {
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    color: #06110c;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #06140f;
     border: none;
-    padding: 13px 20px;
-    border-radius: 10px;
-    font-weight: 700;
+    padding: 0 20px;
+    border-radius: 11px;
+    font-weight: 600;
     font-size: 14px;
     cursor: pointer;
     white-space: nowrap;
-    transition: transform 0.1s, opacity 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: opacity 0.15s, transform 0.1s;
   }
-  button:hover { opacity: 0.9; }
+  button svg { width: 16px; height: 16px; stroke: #06140f; stroke-width: 2.4; }
+  button:hover { opacity: 0.92; }
   button:active { transform: scale(0.97); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
 
+  /* status */
   .status-box {
     display: none;
     text-align: center;
-    padding: 30px 10px;
+    padding: 34px 10px 30px;
     color: var(--muted);
   }
+  .spinner-wrap { display: flex; justify-content: center; margin-bottom: 16px; }
   .spinner {
-    width: 34px; height: 34px;
-    border: 3px solid var(--border);
+    width: 30px; height: 30px;
+    border: 2.5px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
-    margin: 0 auto 14px;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.75s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
+  #statusText { font-size: 13.5px; }
 
+  /* summary */
   .summary {
     display: none;
+    align-items: center;
+    gap: 8px;
     font-size: 13px;
     color: var(--muted);
     margin-bottom: 14px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     background: var(--panel-2);
-    border-radius: 10px;
+    border-radius: 11px;
     border: 1px solid var(--border);
+    flex-wrap: wrap;
   }
-  .summary b { color: var(--text); }
+  .summary svg { width: 15px; height: 15px; stroke: var(--accent); flex-shrink: 0; }
+  .summary b { color: var(--text); font-weight: 600; }
+  .summary .sep { color: var(--faint); }
+  .summary .warn-line {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--warn);
+    margin-top: 6px;
+    font-size: 12.5px;
+  }
+  .summary .warn-line svg { stroke: var(--warn); width: 14px; height: 14px; }
 
-  .results { display: flex; flex-direction: column; gap: 10px; }
+  /* results */
+  .results { display: flex; flex-direction: column; gap: 8px; }
   .result-item {
     background: var(--panel-2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 1px solid var(--border-soft);
+    border-radius: 11px;
     padding: 12px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+    transition: border-color 0.15s;
   }
-  .result-item .host {
-    font-family: 'Consolas', monospace;
-    font-size: 14px;
-    color: var(--accent);
+  .result-item:hover { border-color: var(--border); }
+  .host-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .host-row svg { width: 15px; height: 15px; stroke: var(--accent); flex-shrink: 0; }
+  .host {
+    font-family: 'SF Mono', 'Consolas', monospace;
+    font-size: 13.5px;
+    color: var(--text);
     word-break: break-all;
   }
-  .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .badge {
-    font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: #0f1a13;
+    font-size: 11.5px;
+    padding: 4px 9px;
+    border-radius: 7px;
+    background: #0e1a15;
     color: var(--accent);
-    border: 1px solid #1e3a28;
-    font-family: monospace;
+    border: 1px solid var(--accent-dim);
+    font-family: 'SF Mono', 'Consolas', monospace;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
-  .badge.cf { color: #ffb454; background: #1f180a; border-color: #3a2c10; }
-  .badge.status-ok { color: var(--accent); }
-  .badge.status-warn { color: #ffb454; }
-  .badge.status-err { color: var(--danger); }
+  .badge svg { width: 11px; height: 11px; }
+  .badge.neutral {
+    color: var(--muted);
+    background: #151a21;
+    border-color: var(--border);
+  }
+  .badge.cf { color: var(--warn); background: #1c1509; border-color: #3d2c0f; }
+  .badge.status-ok { color: var(--accent); background: #0e1a15; border-color: var(--accent-dim); }
+  .badge.status-warn { color: var(--warn); background: #1c1509; border-color: #3d2c0f; }
+  .badge.status-err { color: var(--danger); background: #1e0e0e; border-color: #422; }
 
+  /* empty / error */
   .empty, .error {
     display: none;
-    text-align: center;
-    padding: 24px;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 18px;
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13.5px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
   }
-  .error { color: var(--danger); }
+  .empty svg { stroke: var(--muted); width: 18px; height: 18px; flex-shrink: 0; }
+  .error { color: var(--danger); border-color: #3a1f1f; }
+  .error svg { stroke: var(--danger); width: 18px; height: 18px; flex-shrink: 0; }
 
   footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     text-align: center;
-    color: #4a5560;
-    font-size: 12px;
-    margin-top: 30px;
+    color: var(--faint);
+    font-size: 11.5px;
+    margin-top: 34px;
     line-height: 1.6;
   }
 </style>
@@ -165,32 +245,66 @@
 <body>
 <div class="wrap">
   <header>
-    <div class="logo">Turbo Scan Engine</div>
-    <h1>Subdomain Finder Pro</h1>
-    <p>Cari & cek status subdomain aktif dari sebuah domain</p>
+    <div class="brand-row">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Subdomain Finder Pro</h1>
+        <p>Cari &amp; cek status subdomain aktif dari sebuah domain</p>
+      </div>
+    </div>
   </header>
 
   <div class="card">
     <div class="input-row">
-      <input type="text" id="domainInput" placeholder="contoh: example.com" autocomplete="off">
-      <button id="scanBtn" onclick="startScan()">🔍 Scan</button>
+      <div class="input-field">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/>
+        </svg>
+        <input type="text" id="domainInput" placeholder="contoh: example.com" autocomplete="off">
+      </div>
+      <button id="scanBtn" onclick="startScan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Scan
+      </button>
     </div>
   </div>
 
   <div class="status-box" id="statusBox">
-    <div class="spinner"></div>
+    <div class="spinner-wrap"><div class="spinner"></div></div>
     <div id="statusText">Memulai scan...</div>
   </div>
 
   <div class="summary" id="summary"></div>
-  <div class="error" id="errorBox"></div>
-  <div class="empty" id="emptyBox">⚠️ Tidak ada subdomain aktif yang merespon HTTP.</div>
+
+  <div class="error" id="errorBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="errorText"></span>
+  </div>
+
+  <div class="empty" id="emptyBox">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span>Tidak ada subdomain aktif yang merespon HTTP.</span>
+  </div>
 
   <div class="results" id="results"></div>
 
   <footer>
-    Gunakan hanya pada domain milik sendiri atau target program bug bounty resmi.<br>
-    Data dari crt.sh & hackertarget.com.
+    <span>Gunakan hanya pada domain milik sendiri atau target program bug bounty resmi.</span>
+    <span>Data dari crt.sh &amp; hackertarget.com.</span>
   </footer>
 </div>
 
@@ -201,8 +315,19 @@ const statusBox = document.getElementById('statusBox');
 const statusText = document.getElementById('statusText');
 const summary = document.getElementById('summary');
 const errorBox = document.getElementById('errorBox');
+const errorText = document.getElementById('errorText');
 const emptyBox = document.getElementById('emptyBox');
 const resultsEl = document.getElementById('results');
+
+const ICONS = {
+  globe: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/></svg>`,
+  cloud: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6-1.5A4.5 4.5 0 0 0 6.5 19h11Z"/></svg>`,
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>`,
+  server: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="7" rx="1.5"/><rect x="2" y="14" width="20" height="7" rx="1.5"/><line x1="6" y1="6.5" x2="6.01" y2="6.5"/><line x1="6" y1="17.5" x2="6.01" y2="17.5"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+  target: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>`,
+  alert: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+};
 
 domainInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') startScan();
@@ -249,24 +374,33 @@ async function startScan() {
     statusBox.style.display = 'none';
 
     if (!data.active || data.active.length === 0) {
-      emptyBox.style.display = 'block';
+      emptyBox.style.display = 'flex';
     } else {
-      summary.style.display = 'block';
-      summary.innerHTML = `🎯 Domain: <b>${data.domain}</b> &nbsp;|&nbsp; 
-        Ditemukan: <b>${data.total_found}</b> host &nbsp;|&nbsp; 
-        Dicek: <b>${data.checked}</b> &nbsp;|&nbsp; 
-        Aktif: <b>${data.active.length}</b>
-        ${data.truncated ? '<br><span style="color:#ffb454">⚠️ Hasil dibatasi karena jumlah subdomain terlalu banyak</span>' : ''}`;
+      summary.style.display = 'flex';
+      summary.innerHTML = `
+        ${ICONS.target}
+        <span>Domain: <b>${data.domain}</b></span>
+        <span class="sep">·</span>
+        <span>Ditemukan: <b>${data.total_found}</b> host</span>
+        <span class="sep">·</span>
+        <span>Dicek: <b>${data.checked}</b></span>
+        <span class="sep">·</span>
+        <span>Aktif: <b>${data.active.length}</b></span>
+        ${data.truncated ? `<div class="warn-line">${ICONS.alert}<span>Hasil dibatasi karena jumlah subdomain terlalu banyak</span></div>` : ''}
+      `;
 
       data.active.forEach(item => {
         const div = document.createElement('div');
         div.className = 'result-item';
         div.innerHTML = `
-          <div class="host">✅ ${item.host}</div>
+          <div class="host-row">
+            ${ICONS.check}
+            <span class="host">${item.host}</span>
+          </div>
           <div class="meta">
-            <span class="badge">🌐 ${item.ip}</span>
-            <span class="badge ${item.cloudflare ? 'cf' : ''}">${item.cloudflare ? '☁️ CF' : '🏠 Direct'}</span>
-            <span class="badge ${statusBadgeClass(item.status)}">📟 ${item.status}</span>
+            <span class="badge neutral">${ICONS.globe}${item.ip}</span>
+            <span class="badge ${item.cloudflare ? 'cf' : ''}">${item.cloudflare ? ICONS.cloud + 'CF' : ICONS.home + 'Direct'}</span>
+            <span class="badge ${statusBadgeClass(item.status)}">${ICONS.server}${item.status}</span>
           </div>
         `;
         resultsEl.appendChild(div);
@@ -274,8 +408,8 @@ async function startScan() {
     }
   } catch (err) {
     statusBox.style.display = 'none';
-    errorBox.style.display = 'block';
-    errorBox.textContent = '❌ ' + err.message;
+    errorBox.style.display = 'flex';
+    errorText.textContent = err.message;
   } finally {
     scanBtn.disabled = false;
   }
