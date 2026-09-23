@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subdomain Finder Pro</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #131a22;
+    --panel-2: #1a232e;
+    --border: #24303c;
+    --accent: #3ddc97;
+    --accent-2: #4fa8ff;
+    --text: #e6edf3;
+    --muted: #8896a3;
+    --danger: #ff6b6b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at top, #101820 0%, #0b0f14 60%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 28px; }
+  header .logo {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  header h1 {
+    margin: 8px 0 6px;
+    font-size: 26px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+
+  .input-row { display: flex; gap: 10px; }
+  input[type=text] {
+    flex: 1;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 13px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  input[type=text]:focus { border-color: var(--accent-2); }
+  input[type=text]::placeholder { color: #56636f; }
+
+  button {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    color: #06110c;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.1s, opacity 0.2s;
+  }
+  button:hover { opacity: 0.9; }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .status-box {
+    display: none;
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--muted);
+  }
+  .spinner {
+    width: 34px; height: 34px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .summary {
+    display: none;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--panel-2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .summary b { color: var(--text); }
+
+  .results { display: flex; flex-direction: column; gap: 10px; }
+  .result-item {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .result-item .host {
+    font-family: 'Consolas', monospace;
+    font-size: 14px;
+    color: var(--accent);
+    word-break: break-all;
+  }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #0f1a13;
+    color: var(--accent);
+    border: 1px solid #1e3a28;
+    font-family: monospace;
+  }
+  .badge.cf { color: #ffb454; background: #1f180a; border-color: #3a2c10; }
+  .badge.status-ok { color: var(--accent); }
+  .badge.status-warn { color: #ffb454; }
+  .badge.status-err { color: var(--danger); }
+
+  .empty, .error {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .error { color: var(--danger); }
+
+  footer {
+    text-align: center;
+    color: #4a5560;
+    font-size: 12px;
+    margin-top: 30px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Turbo Scan Engine</div>
+    <h1>Subdomain Finder Pro</h1>
+    <p>Cari & cek status subdomain aktif dari sebuah domain</p>
+  </header>
+
+  <div class="card">
+    <div class="input-row">
+      <input type="text" id="domainInput" placeholder="contoh: example.com" autocomplete="off">
+      <button id="scanBtn" onclick="startScan()">🔍 Scan</button>
+    </div>
+  </div>
+
+  <div class="status-box" id="statusBox">
+    <div class="spinner"></div>
+    <div id="statusText">Memulai scan...</div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <div class="error" id="errorBox"></div>
+  <div class="empty" id="emptyBox">⚠️ Tidak ada subdomain aktif yang merespon HTTP.</div>
+
+  <div class="results" id="results"></div>
+
+  <footer>
+    Gunakan hanya pada domain milik sendiri atau target program bug bounty resmi.<br>
+    Data dari crt.sh & hackertarget.com.
+  </footer>
+</div>
+
+<script>
+const scanBtn = document.getElementById('scanBtn');
+const domainInput = document.getElementById('domainInput');
+const statusBox = document.getElementById('statusBox');
+const statusText = document.getElementById('statusText');
+const summary = document.getElementById('summary');
+const errorBox = document.getElementById('errorBox');
+const emptyBox = document.getElementById('emptyBox');
+const resultsEl = document.getElementById('results');
+
+domainInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') startScan();
+});
+
+function resetUI() {
+  summary.style.display = 'none';
+  errorBox.style.display = 'none';
+  emptyBox.style.display = 'none';
+  resultsEl.innerHTML = '';
+}
+
+function statusBadgeClass(code) {
+  if (code >= 200 && code < 300) return 'status-ok';
+  if (code >= 300 && code < 400) return 'status-warn';
+  return 'status-err';
+}
+
+async function startScan() {
+  const domain = domainInput.value.trim().toLowerCase();
+  if (!domain || !domain.includes('.')) {
+    alert('Masukkan domain yang valid, contoh: example.com');
+    return;
+  }
+
+  resetUI();
+  scanBtn.disabled = true;
+  statusBox.style.display = 'block';
+  statusText.textContent = `Mengumpulkan subdomain untuk ${domain}...`;
+
+  try {
+    const res = await fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Terjadi kesalahan pada server');
+    }
+
+    statusBox.style.display = 'none';
+
+    if (!data.active || data.active.length === 0) {
+      emptyBox.style.display = 'block';
+    } else {
+      summary.style.display = 'block';
+      summary.innerHTML = `🎯 Domain: <b>${data.domain}</b> &nbsp;|&nbsp; 
+        Ditemukan: <b>${data.total_found}</b> host &nbsp;|&nbsp; 
+        Dicek: <b>${data.checked}</b> &nbsp;|&nbsp; 
+        Aktif: <b>${data.active.length}</b>
+        ${data.truncated ? '<br><span style="color:#ffb454">⚠️ Hasil dibatasi karena jumlah subdomain terlalu banyak</span>' : ''}`;
+
+      data.active.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.innerHTML = `
+          <div class="host">✅ ${item.host}</div>
+          <div class="meta">
+            <span class="badge">🌐 ${item.ip}</span>
+            <span class="badge ${item.cloudflare ? 'cf' : ''}">${item.cloudflare ? '☁️ CF' : '🏠 Direct'}</span>
+            <span class="badge ${statusBadgeClass(item.status)}">📟 ${item.status}</span>
+          </div>
+        `;
+        resultsEl.appendChild(div);
+      });
+    }
+  } catch (err) {
+    statusBox.style.display = 'none';
+    errorBox.style.display = 'block';
+    errorBox.textContent = '❌ ' + err.message;
+  } finally {
+    scanBtn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
