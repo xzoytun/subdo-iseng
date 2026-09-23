@@ -4,8 +4,8 @@ import requests
 from http.server import BaseHTTPRequestHandler
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-MAX_SUBDOMAINS_TO_CHECK = 60   # batas biar gak timeout di serverless
-CHECK_WORKERS = 20
+HARD_CAP = 300   # jaring pengaman terakhir untuk domain ekstrem, bukan batas normal
+CHECK_WORKERS = 40
 FETCH_TIMEOUT = 6
 CHECK_TIMEOUT = 3
 
@@ -117,8 +117,8 @@ class handler(BaseHTTPRequestHandler):
                 })
                 return
 
-            truncated = len(all_subs) > MAX_SUBDOMAINS_TO_CHECK
-            to_check = all_subs[:MAX_SUBDOMAINS_TO_CHECK]
+            truncated = len(all_subs) > HARD_CAP
+            to_check = all_subs[:HARD_CAP]
 
             active = []
             with ThreadPoolExecutor(max_workers=CHECK_WORKERS) as executor:
